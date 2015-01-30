@@ -1,0 +1,88 @@
+   <tr style="height: 50px">
+            <td colspan="3">
+                <table border="0" cellpadding="0" cellspacing="0" width="80%">
+                    <tr>
+                        <td style="width: 20%">
+                            <asp:Image runat="server" ID="LogImage" ImageUrl="~/Images/u-turn-symbol.jpg" Width="50px"
+                                Height="50px" />
+                        </td>
+                        <td style="width: 60%; vertical-align: middle; text-align: center" class="style1">
+                            <strong><em>U - Turn.Com </em></strong>
+                        </td>
+                        <td style="width: 20%">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr style="height: 30px">
+            <td colspan="3">
+                <div>
+                    <ul id="menu">
+                        <li><a href="#" class="drop">Home</a> </li>
+                        <li><a href="#">Job Search</a>
+                            <div class="dropdown_3columns">
+                                <div class="col_4">
+                                    <ul>
+                                        <li><a href="#">
+                                            <div class="col_4">
+                                                <h3>
+                                                    Advance Job Search</h3>
+                                            </div>
+                                        </a></li>
+                                        <li><a href="#">
+                                            <div class="col_4">
+                                                <h3>
+                                                    Jobs by Location</h3>
+                                            </div>
+                                        </a></li>
+                                        <li><a href="#">
+                                            <div class="col_4">
+                                                <h3>
+                                                    Jobs by Functional Area</h3>
+                                            </div>
+                                        </a></li>
+                                        <li><a href="#">
+                                            <div class="col_4">
+                                                <h3>
+                                                    Jobs by Role</h3>
+                                            </div>
+                                        </a></li>
+                                        <li><a href="#">
+                                            <div class="col_4">
+                                                <h3>
+                                                    Jobs by Skills</h3>
+                                            </div>
+                                        </a></li>
+                                        <li><a href="#">
+                                            <div class="col_4">
+                                                <h3>
+                                                    Jobs by Employers</h3>
+                                            </div>
+                                        </a></li>
+                                        <li><a href="#">
+                                            <div class="col_4">
+                                                <h3>
+                                                    Jobs by Sector</h3>
+                                            </div>
+                                        </a>
+                                            <div class="col_4">
+                                                <ul>
+                                                    <li><a href="#">Construction</a></li>
+                                                    <li><a href="#">Marine</a></li>
+                                                    <li><a href="#">Service</a></li>
+                                                    <li><a href="#">Manafacturing</a></li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                        <li><a href="#">Post your Resume</a></li>
+                        <li><a href="#">Employer's Zone</a></li>
+                        <li><a href="#">About</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
