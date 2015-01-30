@@ -1,0 +1,362 @@
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center">
+                Job Seeker Registration
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="left">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr >
+                        <td class="PanMenu"  colspan="2">
+                            Personal Details
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 35%">
+                            First Name:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_FirstName" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Last Name:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_LastName" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Gender* :
+                        </td>
+                        <td>
+                            <asp:RadioButtonList ID="rb_Gender" runat="server">
+                                <asp:ListItem Selected="True" Text="Male" Value="1"></asp:ListItem>
+                                <asp:ListItem Text="Female" Value="2"></asp:ListItem>
+                            </asp:RadioButtonList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Date Of Birth* :
+                        </td>
+                        <td>
+                            <asp:DropDownList ID="ddl_DOB_Date" runat="server">
+                                <asp:ListItem Text="1" Value="1"></asp:ListItem>
+                                <asp:ListItem Text="2" Value="2"></asp:ListItem>
+                                <asp:ListItem Text="3" Value="3"></asp:ListItem>
+                                <asp:ListItem Text="4" Value="4"></asp:ListItem>
+                                <asp:ListItem Text="5" Value="5"></asp:ListItem>
+                                <asp:ListItem Text="6" Value="6"></asp:ListItem>
+                                <asp:ListItem Text="7" Value="7"></asp:ListItem>
+                                <asp:ListItem Text="8" Value="8"></asp:ListItem>
+                                <asp:ListItem Text="9" Value="9"></asp:ListItem>
+                                <asp:ListItem Text="10" Value="10"></asp:ListItem>
+                                <asp:ListItem Text="11" Value="11"></asp:ListItem>
+                                <asp:ListItem Text="12" Value="12"></asp:ListItem>
+                                <asp:ListItem Text="13" Value="13"></asp:ListItem>
+                                <asp:ListItem Text="14" Value="14"></asp:ListItem>
+                                <asp:ListItem Text="15" Value="15"></asp:ListItem>
+                                <asp:ListItem Text="16" Value="16"></asp:ListItem>
+                                <asp:ListItem Text="17" Value="17"></asp:ListItem>
+                                <asp:ListItem Text="18" Value="18"></asp:ListItem>
+                                <asp:ListItem Text="19" Value="19"></asp:ListItem>
+                                <asp:ListItem Text="20" Value="20"></asp:ListItem>
+                                <asp:ListItem Text="21" Value="21"></asp:ListItem>
+                                <asp:ListItem Text="22" Value="22"></asp:ListItem>
+                                <asp:ListItem Text="23" Value="23"></asp:ListItem>
+                                <asp:ListItem Text="24" Value="24"></asp:ListItem>
+                                <asp:ListItem Text="25" Value="25"></asp:ListItem>
+                                <asp:ListItem Text="26" Value="26"></asp:ListItem>
+                                <asp:ListItem Text="27" Value="27"></asp:ListItem>
+                                <asp:ListItem Text="28" Value="28"></asp:ListItem>
+                                <asp:ListItem Text="29" Value="29"></asp:ListItem>
+                                <asp:ListItem Text="30" Value="30"></asp:ListItem>
+                                <asp:ListItem Text="31" Value="31"></asp:ListItem>
+                                <asp:ListItem Text="32" Value="32"></asp:ListItem>
+                            </asp:DropDownList>
+                            -
+                            <asp:DropDownList ID="ddl_DOB_Month" runat="server">
+                                <asp:ListItem Text="Jan" Value="Jan"></asp:ListItem>
+                                <asp:ListItem Text="Feb" Value="Feb"></asp:ListItem>
+                                <asp:ListItem Text="Mar" Value="Mar"></asp:ListItem>
+                                <asp:ListItem Text="Apr" Value="Apr"></asp:ListItem>
+                                <asp:ListItem Text="May" Value="May"></asp:ListItem>
+                                <asp:ListItem Text="Jun" Value="Jun"></asp:ListItem>
+                                <asp:ListItem Text="Jul" Value="Jul"></asp:ListItem>
+                                <asp:ListItem Text="Aug" Value="Aug"></asp:ListItem>
+                                <asp:ListItem Text="Sep" Value="Sep"></asp:ListItem>
+                                <asp:ListItem Text="Oct" Value="Oct"></asp:ListItem>
+                                <asp:ListItem Text="Nov" Value="Nov"></asp:ListItem>
+                                <asp:ListItem Text="Dec" Value="Dec"></asp:ListItem>
+                            </asp:DropDownList>
+                            -
+                            <asp:DropDownList ID="ddl_DOB_Year" runat="server">
+                                <asp:ListItem Selected="True" Text="YYYY" Value="0"></asp:ListItem>
+                            </asp:DropDownList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Nationality:
+                        </td>
+                        <td>
+                            <asp:DropDownList ID="ddl_Nationality" runat="server">
+                            </asp:DropDownList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Visa Type in Singapore:
+                        </td>
+                        <td>
+                            <asp:DropDownList ID="ddl_ResidencyStatus" runat="server">
+                            </asp:DropDownList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            NRIC:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_NRI" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Passport No:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_PassportNo" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Passport Issue Place:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_PassportIssuePlace" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Passport Exp Date:
+                        </td>
+                        <td>
+                            <asp:DropDownList ID="ddl_PassportExpDate" runat="server">
+                                <asp:ListItem Text="1" Value="1"></asp:ListItem>
+                                <asp:ListItem Text="2" Value="2"></asp:ListItem>
+                                <asp:ListItem Text="3" Value="3"></asp:ListItem>
+                                <asp:ListItem Text="4" Value="4"></asp:ListItem>
+                                <asp:ListItem Text="5" Value="5"></asp:ListItem>
+                                <asp:ListItem Text="6" Value="6"></asp:ListItem>
+                                <asp:ListItem Text="7" Value="7"></asp:ListItem>
+                                <asp:ListItem Text="8" Value="8"></asp:ListItem>
+                                <asp:ListItem Text="9" Value="9"></asp:ListItem>
+                                <asp:ListItem Text="10" Value="10"></asp:ListItem>
+                                <asp:ListItem Text="11" Value="11"></asp:ListItem>
+                                <asp:ListItem Text="12" Value="12"></asp:ListItem>
+                                <asp:ListItem Text="13" Value="13"></asp:ListItem>
+                                <asp:ListItem Text="14" Value="14"></asp:ListItem>
+                                <asp:ListItem Text="15" Value="15"></asp:ListItem>
+                                <asp:ListItem Text="16" Value="16"></asp:ListItem>
+                                <asp:ListItem Text="17" Value="17"></asp:ListItem>
+                                <asp:ListItem Text="18" Value="18"></asp:ListItem>
+                                <asp:ListItem Text="19" Value="19"></asp:ListItem>
+                                <asp:ListItem Text="20" Value="20"></asp:ListItem>
+                                <asp:ListItem Text="21" Value="21"></asp:ListItem>
+                                <asp:ListItem Text="22" Value="22"></asp:ListItem>
+                                <asp:ListItem Text="23" Value="23"></asp:ListItem>
+                                <asp:ListItem Text="24" Value="24"></asp:ListItem>
+                                <asp:ListItem Text="25" Value="25"></asp:ListItem>
+                                <asp:ListItem Text="26" Value="26"></asp:ListItem>
+                                <asp:ListItem Text="27" Value="27"></asp:ListItem>
+                                <asp:ListItem Text="28" Value="28"></asp:ListItem>
+                                <asp:ListItem Text="29" Value="29"></asp:ListItem>
+                                <asp:ListItem Text="30" Value="30"></asp:ListItem>
+                                <asp:ListItem Text="31" Value="31"></asp:ListItem>
+                                <asp:ListItem Text="32" Value="32"></asp:ListItem>
+                            </asp:DropDownList>
+                            -
+                            <asp:DropDownList ID="ddl_PassportExpMonth" runat="server">
+                                <asp:ListItem Text="Jan" Value="Jan"></asp:ListItem>
+                                <asp:ListItem Text="Feb" Value="Feb"></asp:ListItem>
+                                <asp:ListItem Text="Mar" Value="Mar"></asp:ListItem>
+                                <asp:ListItem Text="Apr" Value="Apr"></asp:ListItem>
+                                <asp:ListItem Text="May" Value="May"></asp:ListItem>
+                                <asp:ListItem Text="Jun" Value="Jun"></asp:ListItem>
+                                <asp:ListItem Text="Jul" Value="Jul"></asp:ListItem>
+                                <asp:ListItem Text="Aug" Value="Aug"></asp:ListItem>
+                                <asp:ListItem Text="Sep" Value="Sep"></asp:ListItem>
+                                <asp:ListItem Text="Oct" Value="Oct"></asp:ListItem>
+                                <asp:ListItem Text="Nov" Value="Nov"></asp:ListItem>
+                                <asp:ListItem Text="Dec" Value="Dec"></asp:ListItem>
+                            </asp:DropDownList>
+                            -
+                            <asp:DropDownList ID="ddl_PassportExpYear" runat="server">
+                                <asp:ListItem Selected="True" Text="YYYY" Value="0"></asp:ListItem>
+                            </asp:DropDownList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Mobile No:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_MobileNo" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Email Id:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_EmailId" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="PanMenu">
+                            Education Details
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 35%;">
+                            Select your Education _Qualification:
+                        </td>
+                        <td>
+                            <asp:DropDownList ID="ddl_Qualification" runat="server">
+                            </asp:DropDownList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Specialization:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_speciality" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Other Skill Certification:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_otherskill1" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:LinkButton ID="lb_othercertification" Text="Add other Certification" runat="server"></asp:LinkButton>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="PanMenu">
+                            Current Professional Details
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 35%">
+                            Job Preference:
+                        </td>
+                        <td>
+                            <asp:RadioButtonList ID="rd_jobpreference" runat="server" RepeatDirection="Horizontal">
+                                <asp:ListItem Selected="True" Text="Full Time" Value="1"></asp:ListItem>
+                                <asp:ListItem Text="Part Time" Value="2"></asp:ListItem>
+                            </asp:RadioButtonList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Total Work Experience:
+                        </td>
+                        <td>
+                            <asp:DropDownList ID="ddl_year_workexoerience" runat="server">
+                                <asp:ListItem Text="Select Year" Value="0"></asp:ListItem>
+                                <asp:ListItem Text="0" Value="0"></asp:ListItem>
+                                <asp:ListItem Text="1" Value="1"></asp:ListItem>
+                                <asp:ListItem Text="2" Value="2"></asp:ListItem>
+                                <asp:ListItem Text="3" Value="3"></asp:ListItem>
+                                <asp:ListItem Text="4" Value="4"></asp:ListItem>
+                                <asp:ListItem Text="5" Value="5"></asp:ListItem>
+                                <asp:ListItem Text="6" Value="6"></asp:ListItem>
+                                <asp:ListItem Text="7" Value="7"></asp:ListItem>
+                                <asp:ListItem Text="8" Value="8"></asp:ListItem>
+                                <asp:ListItem Text="9" Value="9"></asp:ListItem>
+                                <asp:ListItem Text="10" Value="10"></asp:ListItem>
+                                <asp:ListItem Text="11" Value="11"></asp:ListItem>
+                                <asp:ListItem Text="12" Value="12"></asp:ListItem>
+                                <asp:ListItem Text="13" Value="13"></asp:ListItem>
+                                <asp:ListItem Text="14" Value="14"></asp:ListItem>
+                                <asp:ListItem Text="15" Value="15"></asp:ListItem>
+                                <asp:ListItem Text="16" Value="16"></asp:ListItem>
+                                <asp:ListItem Text="17" Value="17"></asp:ListItem>
+                                <asp:ListItem Text="18" Value="18"></asp:ListItem>
+                                <asp:ListItem Text="19" Value="19"></asp:ListItem>
+                                <asp:ListItem Text="20" Value="20"></asp:ListItem>
+                                <asp:ListItem Text="21" Value="21"></asp:ListItem>
+                                <asp:ListItem Text="22" Value="22"></asp:ListItem>
+                                <asp:ListItem Text="23" Value="23"></asp:ListItem>
+                                <asp:ListItem Text="24" Value="24"></asp:ListItem>
+                                <asp:ListItem Text="25" Value="25"></asp:ListItem>
+                                <asp:ListItem Text="26" Value="26"></asp:ListItem>
+                                <asp:ListItem Text="27" Value="27"></asp:ListItem>
+                                <asp:ListItem Text="28" Value="28"></asp:ListItem>
+                                <asp:ListItem Text="29" Value="29"></asp:ListItem>
+                                <asp:ListItem Text="30" Value="30"></asp:ListItem>
+                                <asp:ListItem Text="31" Value="31"></asp:ListItem>
+                                <asp:ListItem Text="32" Value="32"></asp:ListItem>
+                            </asp:DropDownList>
+                            -
+                            <asp:DropDownList ID="ddl_month_workexperience" runat="server">
+                                <asp:ListItem Text="Select Month" Value="0"></asp:ListItem>
+                                <asp:ListItem Text="1" Value="1"></asp:ListItem>
+                                <asp:ListItem Text="2" Value="2"></asp:ListItem>
+                                <asp:ListItem Text="3" Value="3"></asp:ListItem>
+                                <asp:ListItem Text="4" Value="4"></asp:ListItem>
+                                <asp:ListItem Text="5" Value="5"></asp:ListItem>
+                                <asp:ListItem Text="6" Value="6"></asp:ListItem>
+                                <asp:ListItem Text="7" Value="7"></asp:ListItem>
+                                <asp:ListItem Text="8" Value="8"></asp:ListItem>
+                                <asp:ListItem Text="9" Value="9"></asp:ListItem>
+                                <asp:ListItem Text="10" Value="10"></asp:ListItem>
+                                <asp:ListItem Text="11" Value="11"></asp:ListItem>
+                            </asp:DropDownList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Current Job Role:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_jobrole" Width="200px" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Key Skills:
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txt_keyskill" Width="350px" Height="100px" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Industry:
+                        </td>
+                        <td>
+                            <asp:DropDownList ID="ddl_industry" runat="server">
+                                <asp:ListItem Text="" Value=""></asp:ListItem>
+                            </asp:DropDownList>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+        </tr>
+    </table>
