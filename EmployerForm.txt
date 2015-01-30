@@ -1,0 +1,242 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EmployerDetaails.aspx.cs"
+    Inherits="EmployerPortal.EmployerDetaails" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div id="dvEmployerDetails">
+        <table align="center">
+            <tr>
+                <td>
+                    <asp:Label ID="lblCompanyName" runat="server" Text="Company Name"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtCompanyName" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblRegNo" runat="server" Text="Registeration No"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtRegNo" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblAddress" runat="server" Text="Address"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtAddress" runat="server" TextMode="MultiLine"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblPostalCode" runat="server" Text="Postal Code"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtPostalCode" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblIndustryType" runat="server" Text="Industry Type"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:DropDownList ID="txtIndustryType" runat="server">
+                        </asp:DropDownList>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblPhoneNo" runat="server" Text="Phone No"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtPhoneNo" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblFax" runat="server" Text="Fax"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtFax" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblEmail" runat="server" Text="E-Mail ID"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtEmail" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    </br> </br> </br> </br>
+    <div id="dvReqAdmin">
+        <table align="center">
+            <tr>
+                <td>
+                    <asp:Label ID="lblAdminUserName" runat="server" Text="User Name"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtAdminUserName" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblAdminPassword" runat="server" Text="Password"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtAdminPassword" runat="server" TextMode="Password"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblAdminName" runat="server" Text="Person Name"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtAdminName" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblAdminMobileNo" runat="server" Text="Mobile No"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtAdminMobileNo" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblAdminEmail" runat="server" Text="E-Mail"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtAdminEmail" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    </br> </br> </br> </br>
+     <div id="DivMgr">
+        <table align="center">
+            <tr>
+                <td>
+                    <asp:Label ID="lblMgrUserName" runat="server" Text="User Name"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtMgrUserName" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblMgrPassword" runat="server" Text="Password"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtMgrPassword" runat="server" TextMode="Password"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblMgrPersonName" runat="server" Text="Person Name"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtMrgPersonName" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblMgrMobileNo" runat="server" Text="Mobile No"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtMgrMobileNo" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblMgrEmail" runat="server" Text="E-Mail"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtMgrEmail" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+     </br> </br> </br> </br>
+    <div id="DivHR">
+        <table align="center">
+            <tr>
+                <td>
+                    <asp:Label ID="lblHRUserName" runat="server" Text="User Name"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtHRUserName" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lblHRPwd" runat="server" Text="Password"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtHRPwd" runat="server" TextMode="Password"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblHRName" runat="server" Text="Person Name"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtHRName" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblHRMobNo" runat="server" Text="Mobile No"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtHRMobNo" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <asp:Label ID="lblHREmail" runat="server" Text="E-Mail"></asp:Label>
+                </td>
+                <td>
+                    <span style="margin-left: 40px; margin-bottom: 20px; margin-right: 20px; margin-top: 20px">
+                        <asp:TextBox ID="txtHREmail" runat="server"></asp:TextBox></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    </form>
+</body>
+</html>
