@@ -1,0 +1,170 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Security.Cryptography;
+using System.IO;
+using System.Configuration;
+using System.Data.SqlClient;
+using System.Data;
+
+namespace WMS_Customer_Service
+{
+    internal class WMS_Security_Service
+    {
+        static int cmdtimeout = int.Parse(ConfigurationSettings.AppSettings["commandTimeOutVal"]);
+
+        private static byte[] Decrypt(byte[] cipherData,
+                             byte[] Key, byte[] IV)
+        {
+            MemoryStream ms = new MemoryStream();
+
+            Rijndael alg = Rijndael.Create();
+
+
+            alg.Key = Key;
+            alg.IV = IV;
+
+            CryptoStream cs = new CryptoStream(ms,
+                alg.CreateDecryptor(), CryptoStreamMode.Write);
+
+            // Write the data and make it do the decryption 
+
+            cs.Write(cipherData, 0, cipherData.Length);
+
+            cs.Close();
+
+            byte[] decryptedData = ms.ToArray();
+
+            return decryptedData;
+        }
+
+
+        private static string WMS_Password_Decrypt(string cipherText, string Password)
+        {
+
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+
+
+            PasswordDeriveBytes pdb = new PasswordDeriveBytes(Password,
+                new byte[] { 0x87, 0x77, 0x6d, 0x69, 0x74, 0x40, 0x73, 0x70, 0x70, 0x6f, 0x72, 0x74, 0x76, 0x67 });
+
+
+            byte[] decryptedData = Decrypt(cipherBytes,
+                pdb.GetBytes(32), pdb.GetBytes(16));
+
+
+            return System.Text.Encoding.Unicode.GetString(decryptedData);
+        }
+
+        internal static bool Check_Web_Request(string Web_Key_WMS, int CallingMode, string IP_or_CallerID_or_MobilNo)
+        {
+            bool Web_Validation = false;
+            try
+            {
+                int Password_Valid_Time = Convert.ToInt32(ConfigurationManager.AppSettings["Password_Valid_Time"].ToString());
+                string GetPasswordValue = "";
+                bool CheckTimeStampFlag = false;
+                if (CallingMode == 1)
+                {
+                    GetPasswordValue = WMS_Password_Decrypt(Web_Key_WMS, "ITSupp0rt@WMS");
+                }
+                else
+                {
+                    GetPasswordValue = Web_Key_WMS;
+                }
+                string[] SplitPasswd = GetPasswordValue.Split('~');
+                if (CallingMode == 1)
+                {
+                    if (Convert.ToDateTime(SplitPasswd[1]) < DateTime.Now && Convert.ToDateTime(SplitPasswd[1]).AddMinutes(Password_Valid_Time) > DateTime.Now)
+                    {
+                        CheckTimeStampFlag = true;
+                    }
+                    else
+                    {
+                        CheckTimeStampFlag = false;
+                    }
+                }
+                else
+                {
+                    DateTime refDate = new DateTime(1991, 8, 20, 09, 00, 00);
+                    if (SplitPasswd[1] != null && SplitPasswd[1] != "" && refDate.AddSeconds(Convert.ToDouble(SplitPasswd[1])) > DateTime.Now.AddMinutes(-(Password_Valid_Time))
+                        && refDate.AddSeconds(Convert.ToDouble(SplitPasswd[1])) < DateTime.Now.AddMinutes(Password_Valid_Time))
+                    {
+                        CheckTimeStampFlag = true;
+                    }
+                    else
+                    {
+                        CheckTimeStampFlag = false;
+                    }
+                }
+                if (CheckTimeStampFlag)
+                {
+                    char[] SplitStr = SplitPasswd[0].ToCharArray();
+                    if (SplitStr.Length >= 15)
+                    {
+                        switch (SplitStr[5])
+                        {
+                            case '1': if (Convert.ToString(SplitStr[1].ToString() + SplitStr[4].ToString() + SplitStr[6].ToString() + SplitStr[19].ToString() + SplitStr[10].ToString() + SplitStr[12].ToString() + SplitStr[14].ToString() + SplitStr[17].ToString() + SplitStr[15].ToString()) == "@Cc3l@Wty")
+                                    Web_Validation = true;
+                                else
+                                    Web_Validation = false;
+                                break;
+                            case '2': if (Convert.ToString(SplitStr[1].ToString() + SplitStr[3].ToString() + SplitStr[9].ToString() + SplitStr[7].ToString() + SplitStr[11].ToString() + SplitStr[18].ToString() + SplitStr[14].ToString() + SplitStr[19].ToString() + SplitStr[12].ToString() + SplitStr[15].ToString() + SplitStr[4].ToString()) == "wTy@SeRv0r2")
+                                    Web_Validation = true;
+                                else
+                                    Web_Validation = false;
+                                break;
+                            case '3': if (Convert.ToString(SplitStr[6].ToString() + SplitStr[2].ToString() + SplitStr[0].ToString() + SplitStr[10].ToString() + SplitStr[12].ToString() + SplitStr[14].ToString() + SplitStr[13].ToString() + SplitStr[16].ToString() + SplitStr[19].ToString() + SplitStr[3].ToString() + SplitStr[7].ToString() + SplitStr[8].ToString() + SplitStr[1].ToString() + SplitStr[4].ToString()) == "@CC3lItSeRv0r2")
+                                    Web_Validation = true;
+                                else
+                                    Web_Validation = false;
+                                break;
+                            default: Web_Validation = false;
+                                break;
+
+
+                        }
+                    }
+                    if (!Web_Validation)
+                    {
+                        //Send Email to Admin for Unauthorized person access…
+
+                        string constr1 = ConfigurationManager.ConnectionStrings["EproCon"].ConnectionString;
+                        SqlConnection conn1 = new SqlConnection(constr1);
+                        try
+                        {
+                            if (conn1 != null)
+                            {
+                                conn1.Open();
+                                string sp = "WMS_Customer_Service_WebService_Send_Mail_to_Admin";
+                                SqlCommand cmd = new SqlCommand(sp, conn1);
+
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.CommandTimeout = cmdtimeout;
+                                cmd.Parameters.Add("@Access_person_Information", SqlDbType.VarChar, 500);
+                                cmd.Parameters["@Access_person_Information"].Value = IP_or_CallerID_or_MobilNo;
+                                cmd.Parameters.Add("@MessageString", SqlDbType.VarChar, 200);
+                                cmd.Parameters["@MessageString"].Value = "Unauthorized person access…";
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        catch (Exception ex1)
+                        {
+                            string Err = ex1.Message;
+                        }
+                        finally
+                        {
+                            conn1.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ToString();
+            }
+            return Web_Validation;
+        }
+    }
+}
