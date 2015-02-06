@@ -1,0 +1,2341 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web.UI.WebControls;
+using System.Configuration;
+using System.Collections;
+using System.Web.UI;
+
+namespace Common.DBConnectivity
+{
+    /// <summary>
+    /// Specifies various Store Ledgers. 
+    /// </summary>
+    public enum Ledger
+    {
+        /// <summary>
+        /// Indicates Good - Customer Property - Receive Ledger.
+        /// </summary>
+        GoodCPReceipt=1,
+        
+        /// <summary>
+        /// Indicates Good - Accel/Client - Receive Ledger.
+        /// </summary>
+        GoodClientReceipt,
+        
+        /// <summary>
+        /// Indicates Good - PV  - Receive Ledger.
+        /// </summary>
+        GoodPVReceipt,
+        
+        /// <summary>
+        /// Indicates Defective - Customer Property - Receive Ledger.
+        /// </summary>
+        DefectiveCPReceipt,
+        
+        /// <summary>
+        /// Indicates Defective - Accel/Client - Receive Ledger.
+        /// </summary>
+        DefectivieClientReceipt,
+        
+        /// <summary>
+        /// Indicates Defective - PV - Receive Ledger.
+        /// </summary>
+        DefectivePVReceipt,
+        
+        /// <summary>
+        /// Indicates Good - Customer Property - Issue Ledger.
+        /// </summary>
+        GoodCPIssue,
+        
+        /// <summary>
+        /// Indicates Good - Accel/Client - Issue Ledger.
+        /// </summary>
+        GoodClientIssue,
+        
+        /// <summary>
+        /// Indicates Good - PV - Issue Ledger.
+        /// </summary>
+        GoodPVIssue,
+        
+        /// <summary>
+        /// Indicates Defective - Customer Property - Issue Ledger.
+        /// </summary>
+        DefectiveCPIssue,
+        
+        /// <summary>
+        /// Indicates Defective - Accel/Client - Issue Ledger.
+        /// </summary>
+        DefectiveClientIssue,
+        
+        /// <summary>
+        /// Indicates Defective - PV - Issue Ledger.
+        /// </summary>
+        DefectivePVIssue
+    }
+
+    public class DatabaseConnect
+    {
+        SqlCommand cmd;
+        int cmdtimeout = int.Parse(ConfigurationSettings.AppSettings["commandTimeOutVal"]); 
+        IDataReader iread;
+        /// <summary>
+        /// Declaring the variables needed
+        /// </summary>
+        //SqlDataSource DSource = new SqlDataSource();
+        //SqlCommand command1 = new SqlCommand();
+        ParameterCollection ParamColl = new ParameterCollection();
+        DataTable EproTable = new DataTable();
+        DataTable EproTable1 = new DataTable();
+        
+        int RetValue = 0;
+        string RetDBValue = "";
+        string ScalarValue = "";
+        string RetSingleValue = "";
+        string strValueType = "";
+
+        /// <summary>
+        /// Initializes a new instance of DatabaseConnect class.
+        /// </summary>
+        //public DatabaseConnect()
+        //{
+        //    //DSource.ConnectionString = ConfigurationManager.ConnectionStrings["EproCon"].ConnectionString;
+        //    DSource.Updated += new SqlDataSourceStatusEventHandler(DSource_Updated);
+        //    DSource.Deleted += new SqlDataSourceStatusEventHandler(DSource_Deleted);
+        //}
+
+        /// <summary>
+        /// Initializes connection string to the data source.
+        /// </summary>
+        //public void EProConnectionString(string con)
+        //{
+        //    DSource.ConnectionString = con;
+        //}
+
+        /// <summary>
+        /// Performs an insert operation in the underlying datasource.
+        /// </summary>
+        /// <param name="SqlQuery">T-Sql Query to be executed.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed to T-Sql statement.</param>
+        public void InsertValues(string SqlQuery, ParameterCollection ParamCollect)
+        {
+            //try
+            //{
+            //    DSource.InsertParameters.Clear();
+            //    //DSource.InsertCommand = SqlQuery;
+            //    DSource.InsertCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //    foreach (Parameter Param in ParamCollect)
+            //        DSource.InsertParameters.Add(Param);
+            //    DSource.Insert();
+
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+             SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(SqlQuery, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.Text;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs an insert operation in the underlying datasource.
+        /// </summary>
+        /// <param name="SqlQuery">T-Sql Query to be executed.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to T-Sql statement.</param>
+        public void InsertValues(string SqlQuery, params Parameter[] ParamCollect)
+        {
+            //try
+        //    {
+                
+        //        DSource.InsertParameters.Clear();
+        //        DSource.InsertCommand = SqlQuery;
+        //        DSource.InsertCommandType = SqlDataSourceCommandType.Text;
+        //        foreach (Parameter Param in ParamCollect)
+        //            DSource.InsertParameters.Add(Param);
+        //        DSource.Insert();
+
+        //    }
+        //    catch (Exception EProex)
+        //    {
+        //        throw EProex;
+        //    }
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(SqlQuery, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.Text;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs an insert operation in the underlying datasource.
+        /// </summary>
+        /// <param name="dTable">System.Data.DataTable object that contains insert values.</param>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        public void InsertBulkValues(DataTable dTable, string tablename)
+        {
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                SqlBulkCopy sqlbulk = new SqlBulkCopy(con);
+                sqlbulk.DestinationTableName = tablename;
+                sqlbulk.WriteToServer(dTable);
+                //sqlbulk.SqlRowsCopied+=new SqlRowsCopiedEventHandler(sqlbulk_SqlRowsCopied);  
+                 
+                 
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+                
+            }
+        }
+        public void InsertValues(DataTable dTable, string ProcedureName)
+        {
+            if (dTable.Rows.Count > 0)
+            {
+                SqlConnection con;
+                con = getConnection();
+                try
+                {
+                    con.Open();
+                    for (int RowCnt = 0; RowCnt < dTable.Rows.Count; RowCnt++)
+                    {
+                        FillParamValues(dTable, RowCnt);
+                        cmd = new SqlCommand(ProcedureName, con);
+                        cmd.CommandTimeout = cmdtimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (Parameter Param in ParamColl)
+                        {
+                            if (Param.DefaultValue != null)
+                            {
+                                if (Param.DefaultValue.Trim().Length == 0)
+                                    cmd.Parameters.Add(Param.Name, DBNull.Value);
+                                else
+                                    cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                            }
+                            else
+                            {
+                                cmd.Parameters.Add(Param.Name, DBNull.Value);
+                            }
+                        }
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception Epro)
+                {
+                    //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                    //cmd.CommandType = CommandType.Text;
+                    //cmd.ExecuteNonQuery();
+                    throw Epro;
+                    SqlConnection.ClearPool(con);
+                }
+                finally
+                {
+                    if (con.State == ConnectionState.Open)
+                        con.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs an insert operation in the underlying datasource.
+        /// </summary>
+        /// <param name="dTable">System.Data.DataTable object that contains insert values.</param>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ReturnValue">Specify either true or false to accept return value from the stored procedure.</param>
+        /// <returns></returns>
+        public int InsertValues(DataTable dTable, string ProcedureName, bool ReturnValue)
+        {
+            
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                FillParamValues(dTable);
+                if (ReturnValue)
+                {
+                    //DSource.Inserted += new SqlDataSourceStatusEventHandler(DSource_Inserted);
+                    Parameter Param = new Parameter();
+                    Param.Name = "RETVALUE";
+                    Param.DefaultValue = "0";
+                    Param.Direction = ParameterDirection.ReturnValue;
+                    ParamColl.Add(Param);
+                }
+
+
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamColl)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                    cmd.Parameters[Param.Name].Direction = Param.Direction;
+                }
+
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception EProex)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw EProex;
+                SqlConnection.ClearPool(con);
+            }
+            //return RetValue;
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            if (ReturnValue)
+            {
+                if ((cmd.Parameters["RETVALUE"].Value != null) && (cmd.Parameters["RETVALUE"].Value.ToString() != ""))
+                    return (int)cmd.Parameters["RETVALUE"].Value;
+                else
+                    return 0;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Performs an update operation in the underlying datasource.
+        /// </summary>
+        /// <param name="SqlQuery">T-Sql Query to be executed.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed to T-Sql statement.</param>
+        public void UpdateValues(string SqlQuery, ParameterCollection ParamCollect)
+        {
+           
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(SqlQuery, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.Text;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs an update operation in the underlying datasource.
+        /// </summary>
+        /// <param name="SqlQuery">T-Sql Query to be executed.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to T-Sql statement.</param>
+        public void UpdateValues(string SqlQuery, params Parameter[] ParamCollect)
+        {
+            
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(SqlQuery, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.Text;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs an update operation in the underlying datasource.
+        /// </summary>
+        /// <param name="dTable">System.Data.DataTable object that contains update values.</param>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed to the stored procedure.</param>
+        public void UpdateValues(DataTable dTable, string ProcedureName, ParameterCollection ParamCollect)
+        {
+           
+            if (dTable.Rows.Count > 0)
+            {
+                SqlConnection con;
+                con = getConnection();
+                try
+                {
+                    con.Open();
+                    for (int RowCnt = 0; RowCnt < dTable.Rows.Count; RowCnt++)
+                    {
+                        FillParamValues(dTable, RowCnt);
+                        cmd = new SqlCommand(ProcedureName, con);
+                        cmd.CommandTimeout = cmdtimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (Parameter Param in ParamColl)
+                        {
+                            if (Param.DefaultValue != null)
+                            {
+                                if (Param.DefaultValue.Trim().Length == 0)
+                                    cmd.Parameters.Add(Param.Name, DBNull.Value);
+                                else
+                                    cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                            }
+                            else
+                            {
+                                cmd.Parameters.Add(Param.Name, DBNull.Value);
+                            }
+                        }
+                        if (ParamCollect != null && ParamCollect.Count > 0)
+                        {
+                            foreach (Parameter Param in ParamCollect)
+                            {
+                                if (Param.DefaultValue != null)
+                                {
+                                    if (Param.DefaultValue.Trim().Length == 0)
+                                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                                    else
+                                        cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                                }
+                                else
+                                {
+                                    cmd.Parameters.Add(Param.Name, DBNull.Value);
+                                }
+                            }
+                        }
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception Epro)
+                {
+                    //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                    //cmd.CommandType = CommandType.Text;
+                    //cmd.ExecuteNonQuery();
+                    throw Epro;
+                    SqlConnection.ClearPool(con);
+                }
+                finally
+                {
+                    if (con.State == ConnectionState.Open)
+                        con.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs an update operation in the underlying datasource.
+        /// </summary>
+        /// <param name="dTable">System.Data.DataTable object that contains update values.</param>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to the stored procedure.</param>
+        public void UpdateValues(DataTable dTable, string ProcedureName, params Parameter[] ParamCollect)
+        {
+            
+            if (dTable.Rows.Count > 0)
+            {
+                SqlConnection con;
+                con = getConnection();
+                try
+                {
+                    con.Open();
+                    for (int RowCnt = 0; RowCnt < dTable.Rows.Count; RowCnt++)
+                    {
+                        FillParamValues(dTable, RowCnt);
+                        cmd = new SqlCommand(ProcedureName, con);
+                        cmd.CommandTimeout = cmdtimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (Parameter Param in ParamColl)
+                        {
+                            if (Param.DefaultValue != null)
+                            {
+                                if (Param.DefaultValue.Trim().Length == 0)
+                                    cmd.Parameters.Add(Param.Name, DBNull.Value);
+                                else
+                                    cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                            }
+                            else
+                            {
+                                cmd.Parameters.Add(Param.Name, DBNull.Value);
+                            }
+                        }
+                        if (ParamCollect != null && ParamCollect.Length > 0)
+                        {
+                            foreach (Parameter Param in ParamCollect)
+                            {
+                                if (Param.DefaultValue != null)
+                                {
+                                    if (Param.DefaultValue.Trim().Length == 0)
+                                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                                    else
+                                        cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                                }
+                                else
+                                {
+                                    cmd.Parameters.Add(Param.Name, DBNull.Value);
+                                }
+                            }
+                        }
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception Epro)
+                {
+                    //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                    //cmd.CommandType = CommandType.Text;
+                    //cmd.ExecuteNonQuery();
+                    throw Epro;
+                    SqlConnection.ClearPool(con);
+                }
+                finally
+                {
+                    if (con.State == ConnectionState.Open)
+                        con.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs an update operation in the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed to the stored procedure.</param>
+        public void Update(string ProcedureName, ParameterCollection ParamCollect)
+        {
+            
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        public string Update(string ProcedureName, ParameterCollection ParamCollect, bool ReturnValue)
+        {
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                if (ReturnValue)
+                {
+                    //DSource.Inserted += new SqlDataSourceStatusEventHandler(DSource_Inserted);
+                    Parameter Param = new Parameter();
+                    Param.Name = "RETURNVAL";
+                    Param.DefaultValue = "0";
+                    Param.Size = 18;
+                    Param.Direction = ParameterDirection.Output;
+                    ParamCollect.Add(Param);
+                }
+
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+
+                    }
+                    cmd.Parameters[Param.Name].Direction = Param.Direction;
+                    cmd.Parameters[Param.Name].Size = Param.Size;
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+
+            if (ReturnValue)
+            {
+                if ((cmd.Parameters["RETURNVAL"].Value != null) && (cmd.Parameters["RETURNVAL"].Value.ToString() != ""))
+                    return cmd.Parameters["RETURNVAL"].Value.ToString();
+                else
+                    return "0";
+            }
+            else
+            {
+                return "0";
+            }
+        }
+        
+        /// <summary>
+        /// Performs an update operation in the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to the stored procedure.</param>
+        public void Update(string ProcedureName, params Parameter[] ParamCollect)
+        {
+            
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs a delete operation in the underlying datasource.
+        /// </summary>
+        /// <param name="SqlQuery">T-Sql Query to be executed.</param>
+        /// <param name="CommType">Specify the Commmand Type as either Text or Stored Procedure.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed to T-Sql statement.</param>
+        public void DeleteValues(string SqlQuery, CommandType CommType, ParameterCollection ParamCollect)
+        {
+          
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(SqlQuery, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommType;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs a delete operation in the underlying datasource.
+        /// </summary>
+        /// <param name="SqlQuery">T-Sql Query to be executed.</param>
+        /// <param name="CommType">Specify the Commmand Type as either Text or Stored Procedure.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to T-Sql statement.</param>
+        public void DeleteValues(string SqlQuery, CommandType CommType, params Parameter[] ParamCollect)
+        {
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(SqlQuery, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommType;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs a delete operation in the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed 
+        ///  to the stored procedure.</param>
+        public void DeleteValues(string ProcedureName, ParameterCollection ParamCollect)
+        {
+            
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs a delete operation in the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to the stored procedure.</param>
+        public void DeleteValues(string ProcedureName, params Parameter[] ParamCollect)
+        {
+            
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Method that reads Parameter name and values from the datatable and stores
+        /// in the ArrayList.
+        /// </summary>
+        /// <param name="dTable">System.Data.DataTable object that contains information.</param>
+        private void FillParamValues(DataTable dTable)
+        {
+            ParamColl.Clear();
+            ArrayList ParamName = new ArrayList();
+            ArrayList ParamValue = new ArrayList();
+
+            foreach (DataColumn DCol in dTable.Columns)
+                ParamName.Add(DCol.ColumnName.ToString());
+
+            if (dTable.Rows.Count > 0)
+            {
+                DataRow DRow = dTable.Rows[0];
+                for (int cnt = 0; cnt < DRow.ItemArray.Length; cnt++)
+                {
+                    ParamValue.Add(DRow[cnt].ToString());
+                }
+            }
+
+            for (int cnt = 0; cnt < ParamName.Count; cnt++)
+            {
+                ParamColl.Add(ParamName[cnt].ToString(), ParamValue[cnt].ToString());
+            }
+        }
+
+        /// <summary>
+        /// Method that reads Parameter name and values from the datatable and stores
+        /// in the ArrayList.
+        /// </summary>
+        /// <param name="dTable">System.Data.DataTable object that contains information.</param>
+        /// <param name="RowCnt">The current row number that is passed.</param>
+        private void FillParamValues(DataTable dTable, int RowCnt)
+        {
+            ParamColl.Clear();
+            ArrayList ParamName = new ArrayList();
+            ArrayList ParamValue = new ArrayList();
+
+            foreach (DataColumn DCol in dTable.Columns)
+                ParamName.Add(DCol.ColumnName.ToString());
+
+            if (dTable.Rows.Count > 0)
+            {
+                DataRow DRow = dTable.Rows[RowCnt];
+                for (int cnt = 0; cnt < DRow.ItemArray.Length; cnt++)
+                {
+                    ParamValue.Add(DRow[cnt].ToString());
+                }
+            }
+
+            for (int cnt = 0; cnt < ParamName.Count; cnt++)
+            {
+                ParamColl.Add(ParamName[cnt].ToString(), ParamValue[cnt].ToString());
+            }
+        }
+
+        
+
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <returns>DataTable</returns>
+        public DataTable SelectValues(string ProcedureName)
+        {
+
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                iread = cmd.ExecuteReader();
+                EproTable.Load(iread);                
+                iread.Close();  
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return EproTable;
+        }
+
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource.
+        /// </summary>
+        /// <param name="SqlStatement">The TSQL to be executed.</param>
+        /// <returns>DataTable</returns>
+        public DataTable SelectValuesForSql(string SqlStatement)
+        {
+            
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(SqlStatement, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.Text;
+                iread = cmd.ExecuteReader();
+                EproTable.Load(iread);
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return EproTable;
+        }
+
+
+
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed 
+        ///  to the stored procedure.</param>
+        /// <returns>DataTable</returns>
+        public DataTable SelectValues(string ProcedureName, ParameterCollection ParamCollect)
+        {
+            
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                iread = cmd.ExecuteReader();
+                if (iread != null)
+                {
+                      
+                    EproTable.Clear();
+                    //EproTable.Columns.Clear();  
+                    EproTable.Load(iread);
+                    iread.Close();
+                }
+                else
+                {
+                    EproTable.Clear();
+                    iread.Close();
+                }
+            }
+            catch (Exception Epro)
+            
+            {
+             //   DataRow[] rows = EproTable.GetErrors(); 
+
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return EproTable;
+        }
+
+        
+        public DataTable SelectValues1(string ProcedureName, ParameterCollection ParamCollect)
+        {
+           
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                iread = cmd.ExecuteReader();
+                if (iread != null)
+                {
+                    EproTable1.Clear();
+                    EproTable1.Load(iread);
+                    iread.Close();
+                }
+                else
+                {
+                    EproTable1.Clear();
+                    iread.Close();
+                }
+            }
+            catch (Exception Epro)
+            {
+                 
+
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return EproTable1;
+        }
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to the stored procedure.</param>
+        /// <returns>DataTable</returns>
+        public DataTable SelectValues(string ProcedureName,  params Parameter[] ParamCollect)
+        {
+        
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                iread = cmd.ExecuteReader();
+                EproTable.Load(iread);
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+               throw Epro;
+               SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return EproTable;
+        }
+
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="EProTbl">Type Dataset created in Business Layer to be passed as reference type.</param>
+        /// <returns>Datatable</returns>
+        public DataTable SelectValues(string ProcedureName, ref DataTable EProTbl)
+        {
+           
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                iread = cmd.ExecuteReader();
+                EProTbl.Load(iread);
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return EProTbl;
+        }
+
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="EProTbl">Type Dataset created in Business Layer to be passed as reference type.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to the stored procedure.</param>
+        /// <returns>Datatable</returns>
+        public DataTable SelectValues(string ProcedureName, ref DataTable EProTbl, params Parameter[] ParamCollect)
+        {
+
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                iread = cmd.ExecuteReader();
+                EProTbl.Load(iread);
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return EProTbl;
+        }
+
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="EProTbl">Type Dataset created in Business Layer to be passed as reference type.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed 
+        ///  to the stored procedure.</param>
+        /// <returns>Datatable</returns>
+        public DataTable SelectValues(string ProcedureName, ref DataTable EProTbl, ParameterCollection ParamCollect)
+        {
+           
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+
+                }
+                iread = cmd.ExecuteReader();
+                if (iread != null)
+                    EProTbl.Load(iread);
+                else
+                    EProTbl.Clear();
+
+
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return EProTbl;
+        }
+
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource and returns string value.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">An array of parameters that are passed to the stored procedure.</param>
+        /// <returns>string</returns>
+        public string GetScalar(string ProcedureName, params Parameter[] ParamCollect)
+        {
+           
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                if (cmd.ExecuteScalar() == null)
+                {
+                    ScalarValue = "";
+                }
+                else
+                {
+                    ScalarValue = cmd.ExecuteScalar().ToString();
+                }
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return ScalarValue;
+        }
+
+        /// <summary>
+        /// Performs a Select operation from the underlying datasource and returns string value.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamColl">The Parameter Collection that are passed 
+        ///  to the stored procedure.</param>
+        /// <returns></returns>
+        public string GetScalar(string ProcedureName, ParameterCollection ParamColl)
+        {
+           
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamColl)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                if (cmd.ExecuteScalar() == null)
+                {
+                    ScalarValue = "";
+                }
+                else
+                {
+                    ScalarValue = cmd.ExecuteScalar().ToString();
+                }
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return ScalarValue;
+        }
+
+     
+        /// <summary>
+        /// Method that returns the Next ID.
+        /// </summary>
+        /// <param name="FieldName">The name of the field for which Next ID is needed.</param>
+        /// <returns>string</returns>
+        public string GetNextID(string FieldName)
+        {
+            
+            ParameterCollection PrmColl = new ParameterCollection();
+            PrmColl.Add("FieldName", FieldName);
+            PrmColl.Add("RETVALUE", "0");
+            PrmColl["FieldName"].Direction = ParameterDirection.Input;
+            PrmColl["RETVALUE"].Direction = ParameterDirection.ReturnValue;
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand("GetNextID", con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in PrmColl)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                    cmd.Parameters[Param.Name].Direction = Param.Direction;
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return cmd.Parameters["RETVALUE"].Value.ToString();  
+        }
+
+        /// <summary>
+        /// Method that reads the return value from the parameter.
+        /// </summary>
+        /// <param name="sender">The name of the sender.</param>
+        /// <param name="EProex">Event arguments that are passed.</param>
+        //private void DSource_ReturnNextID(object sender, SqlDataSourceStatusEventArgs EProex)
+        //{
+        //    if (EProex.Command.Connection.State == ConnectionState.Closed)
+        //        EProex.Command.Connection.Open();
+
+        //    if (EProex.Command.Parameters["@RETVALUE"] != null)
+        //        ScalarValue = EProex.Command.Parameters["@RETVALUE"].Value.ToString();
+
+        //    if (EProex.Command.Connection.State == ConnectionState.Open)
+        //        EProex.Command.Connection.Close();
+        //}
+
+        /// <summary>
+        /// Performs changes in Call Registation Status.
+        /// </summary>
+        /// <param name="ParamCollect">The Parameter Collection that are passed to the stored procedure.</param>
+        public void ChangeCallStatus(ParameterCollection ParamCollect)
+        {
+            //try
+            //{
+            //    DSource.UpdateParameters.Clear();
+            //    DSource.UpdateCommand = "ChangeCallStatus";
+            //    DSource.UpdateCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //    foreach (Parameter Param in ParamCollect)
+            //        DSource.UpdateParameters.Add(Param);
+            //    DSource.Update();
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand("ChangeCallStatus", con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs changes in Call Registation Status.
+        /// </summary>
+        /// <param name="ParamCollect">An array of parameters that
+        /// are passed to the stored procedure.</param>
+        public void ChangeCallStatus(params Parameter[] ParamCollect)
+        {
+            //try
+            //{
+            //    DSource.UpdateParameters.Clear();
+            //    DSource.UpdateCommand = "ChangeCallStatus";
+            //    DSource.UpdateCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //    foreach (Parameter Param in ParamCollect)
+            //        DSource.UpdateParameters.Add(Param);
+            //    DSource.Update();
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand("ChangeCallStatus", con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+
+                    }
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs stock updation in the underlying database.
+        /// </summary>
+        /// <param name="ParamCollect">The Parameter Collection that are passed to the stored procedure.</param>
+        public void UpdateStock(ParameterCollection ParamCollect)
+        {
+            //try
+            //{
+            //    DSource.UpdateParameters.Clear();
+            //    DSource.UpdateCommand = "UpdateStock";
+            //    DSource.UpdateCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //    foreach (Parameter Param in ParamCollect)
+            //        DSource.UpdateParameters.Add(Param);
+            //    DSource.Update();
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand("UpdateStock", con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue.Trim().Length == 0)
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    else
+                        cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Performs stock updation in the underlying database.
+        /// </summary>
+        /// <param name="ParamCollect">An array of parameters that
+        /// are passed to the stored procedure.</param>
+        public void UpdateStock(params Parameter[] ParamCollect)
+        {
+            //try
+            //{
+            //    DSource.UpdateParameters.Clear();
+            //    DSource.UpdateCommand = "UpdateStock";
+            //    DSource.UpdateCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //    foreach (Parameter Param in ParamCollect)
+            //        DSource.UpdateParameters.Add(Param);
+            //    DSource.Update();
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand("UpdateStock", con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
+
+        /// <summary>
+        /// Method to accept the return value from the stored procedure.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <param name="ParamCollect">The Parameter Collection that are passed to the stored procedure.</param>
+        /// <returns>System.String</returns>
+        public string GetReturnValue(string ProcedureName, ParameterCollection ParamCollect)
+        {
+            //try
+            //{
+            //    DSource.SelectParameters.Clear();
+            //    Parameter RetParam = new Parameter();
+            //    RetParam.Name = "RETVALUE";
+            //    RetParam.DefaultValue = "0";
+            //    RetParam.Direction = ParameterDirection.ReturnValue;
+            //    ParamCollect.Add(RetParam);
+
+            //    DSource.Selected += new SqlDataSourceStatusEventHandler(DSource_RetValue);
+            //    DSource.SelectCommand = ProcedureName;
+            //    DSource.SelectCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //    foreach (Parameter Param in ParamCollect)
+            //        DSource.SelectParameters.Add(Param);
+            //    DSource.Select(DataSourceSelectArguments.Empty);
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            //return RetSingleValue;
+            SqlConnection con;
+            con = getConnection();
+            Parameter RetParam = new Parameter();
+            RetParam.Name = "RETVALUE";
+            RetParam.DefaultValue = "0";
+            RetParam.Direction = ParameterDirection.ReturnValue;
+            ParamCollect.Add(RetParam);
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                    cmd.Parameters[Param.Name].Direction = Param.Direction;
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return cmd.Parameters["RETVALUE"].Value.ToString();  
+        }
+        public string GetReturnValue(string ProcedureName, ParameterCollection ParamCollect, string myfun)
+        {
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamCollect)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                    cmd.Parameters[Param.Name].Direction = Param.Direction;
+                    cmd.Parameters[Param.Name].Size = Param.Size;
+
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return cmd.Parameters["RETVALUE"].Value.ToString();
+        }
+        /// <summary>
+        /// Method to accept the return value from the stored procedure.
+        /// </summary>
+        /// <param name="ProcedureName">The name of the Stored Procedure to be executed.</param>
+        /// <returns>System.String</returns>
+        public string GetReturnValue(string ProcedureName)
+        {
+            //try
+            //{
+            //    DSource.SelectParameters.Clear();
+            //    ParameterCollection RetParamColl = new ParameterCollection();
+            //    Parameter RetParam = new Parameter();
+            //    RetParam.Name = "RETVALUE";
+            //    RetParam.DefaultValue = "0";
+            //    RetParam.Direction = ParameterDirection.ReturnValue;
+            //    RetParamColl.Add(RetParam);
+
+            //    DSource.Selected += new SqlDataSourceStatusEventHandler(DSource_RetValue);
+            //    DSource.SelectCommand = ProcedureName;
+            //    DSource.SelectCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //    foreach (Parameter Param in RetParamColl)
+            //        DSource.SelectParameters.Add(Param);
+            //    DSource.Select(DataSourceSelectArguments.Empty);
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            //return RetSingleValue;
+            SqlConnection con;
+            con = getConnection();
+            ParameterCollection RetParamColl = new ParameterCollection();
+            Parameter RetParam = new Parameter();
+            RetParam.Name = "RETVALUE";
+            RetParam.DefaultValue = "0";
+            RetParam.Direction = ParameterDirection.ReturnValue;
+            RetParamColl.Add(RetParam);
+            try
+            {
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in RetParamColl)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception Epro)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw Epro;
+                SqlConnection.ClearPool(con);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            return (string)cmd.Parameters["RETVALUE"].Value; 
+        }
+
+        /// <summary>
+        /// Performs Ledger updation in the underlying datasource.
+        /// </summary>
+        /// <param name="LedgerType">Defines the type of the ledger.</param>
+        /// <param name="dTable">System.Data.DataTable object that contains insert values.</param>
+        public void UpdateLedger(Ledger LedgerType, DataTable dTable)
+        {
+            //try
+            //{
+            //    if (dTable.Rows.Count > 0)
+            //    {
+            //        for (int RowCnt = 0; RowCnt < dTable.Rows.Count; RowCnt++)
+            //        {
+            //            FillParamValues(dTable, RowCnt);
+            //            DSource.InsertParameters.Clear();
+            //            DSource.InsertCommand = GetProcedureName(LedgerType);
+            //            DSource.InsertCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //            foreach (Parameter Param in ParamColl)
+            //                DSource.InsertParameters.Add(Param);
+            //            DSource.Insert();
+            //        }
+            //    }
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            if (dTable.Rows.Count > 0)
+            {
+                SqlConnection con;
+                con = getConnection();
+                try
+                {
+                    con.Open();
+                    for (int RowCnt = 0; RowCnt < dTable.Rows.Count; RowCnt++)
+                    {
+                        FillParamValues(dTable, RowCnt);
+                        cmd = new SqlCommand(GetProcedureName(LedgerType), con);
+                        cmd.CommandTimeout = cmdtimeout;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (Parameter Param in ParamColl)
+                        {
+                            if (Param.DefaultValue != null)
+                            {
+                                if (Param.DefaultValue.Trim().Length == 0)
+                                    cmd.Parameters.Add(Param.Name, DBNull.Value);
+                                else
+                                    cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                            }
+                            else
+                            {
+                                cmd.Parameters.Add(Param.Name, DBNull.Value);
+                            }
+                        }
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception Epro)
+                {
+                    //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                    //cmd.CommandType = CommandType.Text;
+                    //cmd.ExecuteNonQuery();
+                    throw Epro;
+                    SqlConnection.ClearPool(con);
+                }
+                finally
+                {
+                    if (con.State == ConnectionState.Open)
+                        con.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Method that returns the Procedure Name based on the Ledger Type.
+        /// </summary>
+        /// <param name="LedgerType">Defines the type of the Ledger.</param>
+        /// <returns>System.String (Procedure Name)</returns>
+        private string GetProcedureName(Ledger LedgerType)
+        {
+            string ProcedureName = "";
+            if (LedgerType == Ledger.DefectiveClientIssue)
+                ProcedureName = "Common_IssDefCLTrans";
+            else if (LedgerType == Ledger.DefectiveCPIssue)
+                ProcedureName = "Common_IssDefCPTrans";
+            else if (LedgerType == Ledger.DefectiveCPReceipt)
+                ProcedureName = "Common_RecDefCPTrans";
+            else if (LedgerType == Ledger.DefectivePVIssue)
+                ProcedureName = "Common_IssDefPVTrans";
+            else if (LedgerType == Ledger.DefectivePVReceipt)
+                ProcedureName = "Common_RecDefPVTrans";
+            else if (LedgerType == Ledger.DefectivieClientReceipt)
+                ProcedureName = "Common_RecDefCLTrans";
+            else if (LedgerType == Ledger.GoodClientIssue)
+                ProcedureName = "Common_IssGoodCLTrans";
+            else if (LedgerType == Ledger.GoodClientReceipt)
+                ProcedureName = "Common_RecGoodCLTrans";
+            else if (LedgerType == Ledger.GoodCPIssue)
+                ProcedureName = "Common_IssGoodCPTrans";
+            else if (LedgerType == Ledger.GoodCPReceipt)
+                ProcedureName = "Common_RecGoodCPTrans";
+            else if (LedgerType == Ledger.GoodPVIssue)
+                ProcedureName = "Common_IssGoodPVTrans";
+            else if (LedgerType == Ledger.GoodPVReceipt)
+                ProcedureName = "Common_RecGoodPVTrans";
+
+            return ProcedureName;
+        }
+
+        /// <summary>
+        /// Performs an update operation in the underlying datasource.
+        /// </summary>
+        /// <param name="ParamCollect">An array of parameters that are passed to the stored procedure.</param>
+        public void UpdateIssueCPEngStatus(params Parameter[] ParamCollect)
+        {
+            //try
+            //{
+            //    if (ParamCollect != null && ParamCollect.Length > 0)
+            //    {
+            //        DSource.UpdateParameters.Clear();
+            //        DSource.UpdateCommand = "Common_IssueToEng";
+            //        DSource.UpdateCommandType = SqlDataSourceCommandType.StoredProcedure;
+            //        foreach (Parameter Param in ParamCollect)
+            //            DSource.UpdateParameters.Add(Param);
+            //        DSource.Update();
+            //    }
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            if (ParamCollect != null && ParamCollect.Length > 0)
+            {
+                SqlConnection con;
+                con = getConnection();
+                try
+                {
+                    con.Open();
+                    cmd = new SqlCommand("Common_IssueToEng", con);
+                    cmd.CommandTimeout = cmdtimeout;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    foreach (Parameter Param in ParamCollect)
+                    {
+                        if (Param.DefaultValue != null)
+                        {
+                            if (Param.DefaultValue.Trim().Length == 0)
+                                cmd.Parameters.Add(Param.Name, DBNull.Value);
+                            else
+                                cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                        }
+                        else
+                        {
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        }
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception Epro)
+                {
+                    //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                    //cmd.CommandType = CommandType.Text;
+                    //cmd.ExecuteNonQuery();
+                    throw Epro;
+                    SqlConnection.ClearPool(con);
+                }
+                finally
+                {
+                    if (con.State == ConnectionState.Open)
+                        con.Close();
+                }
+            }
+        }
+
+        public string InsertValuesBig(DataTable dTable, string ProcedureName, bool ReturnValue)
+        {
+            //try
+            //{
+            //    FillParamValues(dTable);
+            //    if (ReturnValue)
+            //    {
+            //        DSource.Inserted += new SqlDataSourceStatusEventHandler(DSource_InsertedBig);
+            //        Parameter Param = new Parameter();
+            //        Param.Name = "RETURNVAL";
+            //        Param.DefaultValue = "0";
+            //        Param.Size = 15;
+            //        Param.Direction = ParameterDirection.Output;
+            //        ParamColl.Add(Param);
+            //    }
+
+            //    DSource.InsertParameters.Clear();
+            //    DSource.InsertCommand = ProcedureName;
+            //    DSource.InsertCommandType = SqlDataSourceCommandType.StoredProcedure;
+
+            //    foreach (Parameter Param in ParamColl)
+            //        DSource.InsertParameters.Add(Param);
+            //    strValueType = "big";
+            //    DSource.Insert();
+            //}
+            //catch (Exception EProex)
+            //{
+            //    throw EProex;
+            //}
+            //return RetDBValue;
+            SqlConnection con;
+            con = getConnection();
+            try
+            {
+                FillParamValues(dTable);
+                if (ReturnValue)
+                {
+                    //DSource.Inserted += new SqlDataSourceStatusEventHandler(DSource_Inserted);
+                    Parameter Param = new Parameter();
+                    Param.Name = "RETURNVAL";
+                    Param.DefaultValue = "0";
+                    Param.Size = 18;  
+                    Param.Direction = ParameterDirection.Output;
+                    ParamColl.Add(Param);
+                }
+
+                //DSource.InsertParameters.Clear();
+                //DSource.InsertCommand = ProcedureName;
+                //DSource.InsertCommandType = SqlDataSourceCommandType.StoredProcedure;
+
+                //foreach (Parameter Param in ParamColl)
+                //    DSource.InsertParameters.Add(Param);
+                //DSource.Insert();
+                con.Open();
+                cmd = new SqlCommand(ProcedureName, con);
+                cmd.CommandTimeout = cmdtimeout;
+                cmd.CommandType = CommandType.StoredProcedure;
+                foreach (Parameter Param in ParamColl)
+                {
+                    if (Param.DefaultValue != null)
+                    {
+                        if (Param.DefaultValue.Trim().Length == 0)
+                            cmd.Parameters.Add(Param.Name, DBNull.Value);
+                        else
+                            cmd.Parameters.Add(Param.Name, Param.DefaultValue);
+                    }
+                    else
+                    {
+                        cmd.Parameters.Add(Param.Name, DBNull.Value);
+                    }
+                    cmd.Parameters[Param.Name].Direction = Param.Direction;
+                    cmd.Parameters[Param.Name].Size = Param.Size; 
+                }
+
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception EProex)
+            {
+                //cmd = new SqlCommand("IF @@TRANCOUNT>0 ROLLBACK", con);
+                //cmd.CommandType = CommandType.Text;
+                //cmd.ExecuteNonQuery();
+                throw EProex;
+                SqlConnection.ClearPool(con);
+            }
+            //return RetValue;
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+            if (ReturnValue)
+            {
+                if ((cmd.Parameters["RETURNVAL"].Value != null) && (cmd.Parameters["RETURNVAL"].Value.ToString() != ""))
+                    return cmd.Parameters["RETURNVAL"].Value.ToString();
+                else
+                    return "0";
+            }
+            else
+            {
+                return "0";
+            }
+
+        }
+        private SqlConnection getConnection()
+        {
+            SqlConnection conn = new SqlConnection();
+            conn.ConnectionString = ConfigurationManager.ConnectionStrings["EproCon"].ConnectionString;
+            return conn;
+        }
+       
+    } 
+}
